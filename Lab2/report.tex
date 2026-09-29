@@ -1,0 +1,46 @@
+% you don't need a template
+% use the following one
+
+\documentclass[10pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+
+\title{Labwork 2\\\large HPC -- Get to know your GPU}
+\author{
+Le Nghiem Thanh Thuy - 2540023\\
+University of Science and Technology of Hanoi
+}
+\date{}
+
+\begin{document}
+\maketitle
+\section{Knowledge check}
+I learned how to use CUDA for GPU computing in Python.
+I used \texttt{is\_available()} to check whether CUDA is available.
+I used \texttt{list\_devices()} to find available GPUs and \texttt{select\_device()} to choose one.
+The Device provides the GPU’s name, ID, compute capability...
+The Context provides information about the GPU’s memory...
+
+\section{GPU information}
+
+\begin{table}[H]
+\centering
+\caption{GPU information reported by \texttt{numba.cuda} on Google Colab.}
+\label{tab:gpu}
+\begin{tabular}{lr}
+\toprule
+\textbf{Property} & \textbf{Value} \\
+\midrule
+Device name & Tesla T4 \\
+Compute capability & 7.5 \\
+Multiprocessor count & 40 \\
+Cores per SM & 64 \\
+Total CUDA cores & 2560 \\
+Total memory & 14.56 GB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\end{document}
