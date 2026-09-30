@@ -1,0 +1,57 @@
+\documentclass[10pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+
+\title{Labwork 3\\\large HPC -- RGB to grayscale}
+\author{
+Le Nghiem Thanh Thuy - 2540023\\
+University of Science and Technology of Hanoi
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{How I did it}
+The image is \texttt{astronaut()} from \texttt{skimage.data}, size $512\times512$ with 3
+channels, so it has 262144 pixels. Before computing anything I reshape the image from
+$(512, 512, 3)$ to $(262144, 3)$, so the image becomes a flat list of pixels and one
+thread can take care of exactly one pixel.
+
+The grayscale value of a pixel is the average of its three channels,
+$g = (R + G + B) / 3$, and the same value is written back to all three output channels.
+
+\section{Results}
+The two versions give exactly the same image (\texttt{np.array\_equal} returns
+\texttt{True}).
+
+\begin{table}[H]
+\centering
+\caption{Execution time for the grayscale conversion of a $512\times512$ image
+(Tesla T4 on Google Colab).}
+\label{tab:time}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Version} & \textbf{Time (s)} & \textbf{Speedup} \\
+\midrule
+CPU & 0.3154 & 1.0x \\
+GPU & 0.0039 & 80.8x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{original.png}
+\includegraphics[width=0.45\textwidth]{grayscale.png}
+\caption{The original image (left) and the grayscale result (right).}
+\label{fig:result}
+\end{figure}
+
+\section{Comment}
+The GPU is much faster than the CPU loop.
+The first GPU run is slower because it also has to compile the kernel and set up CUDA, so I only measured the time after a warm-up run.
+
+\end{document}
