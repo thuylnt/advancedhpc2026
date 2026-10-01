@@ -1,0 +1,62 @@
+\documentclass[10pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+
+\title{Labwork 4\\\large HPC -- 2D grid for grayscale}
+\author{
+Le Nghiem Thanh Thuy - 2540023\\
+University of Science and Technology of Hanoi
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Preparation}
+The image is the same as in labwork 3, \texttt{astronaut()} from \texttt{skimage.data},
+size $512\times512$ with 3 channels. In labwork 3 I flattened it to $(262144, 3)$ and used
+a 1D grid. Here the image keeps its shape $(512, 512, 3)$ and the threads are organised in
+a 2D grid, so a thread finds its pixel with a row index and a column index instead of a
+single index.
+
+\section{Results}
+I used the same method as in labwork 3: the image stays on the device so only the kernel
+is measured, each configuration is launched once as a warm-up and then 100 times, and I
+take the average.
+
+\begin{table}[H]
+\centering
+\caption{Kernel time for the 2D block sizes (Tesla T4 on Google Colab).}
+\label{tab:2d}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Block size} & \textbf{Threads} & \textbf{Grid} & \textbf{Time (ms)} \\
+\midrule
+$(8, 8)$   &   64 & $(64, 64)$ & 0.0993 \\
+$(16, 8)$  &  128 & $(32, 64)$ & 0.0469 \\
+$(16, 16)$ &  256 & $(32, 32)$ & 0.0411 \\
+$(32, 8)$  &  256 & $(16, 64)$ & 0.0402 \\
+$(16, 32)$ &  512 & $(32, 16)$ & 0.0375 \\
+$(32, 32)$ & 1024 & $(16, 16)$ & 0.0376 \\
+$(64, 16)$ & 1024 & $(8, 32)$  & 0.0404 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{blocksize2d.png}
+\caption{Kernel time of the 1D version (blue) and the 2D version (orange).}
+\label{fig:blocksize2d}
+\end{figure}
+
+The best 2D configuration is $(16, 32)$ with 0.0375 ms and the best 1D one is 256 threads and 512 threads
+with 0.0607 ms.
+
+\section{Comment}
+The 2D grid is more convenient to write, do not have to reshape anything.
+
+
+\end{document}
