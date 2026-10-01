@@ -14,7 +14,7 @@ University of Science and Technology of Hanoi
 \begin{document}
 \maketitle
 
-\section{How I did it}
+\section{Preparation}
 The image is \texttt{astronaut()} from \texttt{skimage.data}, size $512\times512$ with 3
 channels, so it has 262144 pixels. Before computing anything I reshape the image from
 $(512, 512, 3)$ to $(262144, 3)$, so the image becomes a flat list of pixels and one
@@ -34,10 +34,10 @@ The two versions give exactly the same image (\texttt{np.array\_equal} returns
 \label{tab:time}
 \begin{tabular}{lrr}
 \toprule
-\textbf{Version} & \textbf{Time (s)} & \textbf{Speedup} \\
+\textbf{Version} & \textbf{Time (ms)} & \textbf{Speedup} \\
 \midrule
-CPU & 0.3154 & 1.0x \\
-GPU & 0.0039 & 80.8x \\
+CPU & 257.92 & 1.0x \\
+GPU & 3.92 & 65.8x \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -50,8 +50,31 @@ GPU & 0.0039 & 80.8x \\
 \label{fig:result}
 \end{figure}
 
+\section{Different block sizes}
+I ran the same kernel with block sizes 16, 32, 64, 128, 256, 512 and 1024.
+The block size does not change the image, only how the threads are grouped, so the
+result is the same every time. Here I only measured the kernel and kept the image on
+the device, because the memory copies are much slower than the kernel and would hide
+the difference. Each block size is launched once as a warm-up and then 100 times, and
+I take the average.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{blocksize.png}
+\caption{Kernel time for different block sizes.}
+\label{fig:blocksize}
+\end{figure}
+
+A block size of 16 is clearly the slowest (0.152 ms). A warp is 32 threads, so with only
+16 threads per block half of every warp does nothing. From 32 upwards all the times are
+between 0.084 and 0.104 ms, which is quite close to each other, and the fastest one here
+is 64. The kernel is very simple and each thread only reads 3 bytes and writes 3 bytes,
+so the block size does not matter much as long as it is a multiple of the warp size.
+
 \section{Comment}
 The GPU is much faster than the CPU loop.
-The first GPU run is slower because it also has to compile the kernel and set up CUDA, so I only measured the time after a warm-up run.
+The first GPU run is slower because it also has to compile the kernel and set up CUDA
+(148.44 ms, against 3.92 ms for the next one), so I only measured the time after a
+warm-up run.
 
 \end{document}
