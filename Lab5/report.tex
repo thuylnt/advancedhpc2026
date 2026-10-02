@@ -1,0 +1,68 @@
+\documentclass[10pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+
+\title{Labwork 5\\\large HPC -- Gaussian blur convolution}
+\author{
+Le Nghiem Thanh Thuy - 2540023\\
+University of Science and Technology of Hanoi
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Preparation}
+The image is \texttt{astronaut()} from \texttt{skimage.data}, size $512\times512$ with 3
+channels. The blur uses the $7\times7$ Gaussian kernel given in the labwork, whose weights
+add up to 1003, so after multiplying the window by the kernel I divide the sum by 1003 to
+keep the brightness.
+
+Every output pixel is the weighted sum of the $7\times7$ window centred on it. 
+
+I wrote three versions: a CPU one as a reference, a GPU one reading from global memory, and
+a GPU one using shared memory. All three give exactly the same image
+(\texttt{np.array\_equal} returns \texttt{True}).
+
+\section{Results}
+The CPU version takes 8971 ms.
+
+The GPU is kept busy for one second first so that its clock is already up, then every
+configuration is launched once as a warm-up and 20 times for the measurement, and I keep
+the fastest one.
+
+\begin{table}[H]
+\centering
+\caption{Kernel time with and without shared memory (Tesla T4 on Google Colab).}
+\label{tab:shared}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Block size} & \textbf{Global memory (ms)} & \textbf{Shared memory (ms)} & \textbf{Speedup} \\
+\midrule
+$(8, 8)$   & 0.521 & 0.386 & 1.35x \\
+$(16, 8)$  & 0.512 & 0.379 & 1.35x \\
+$(16, 16)$ & 0.510 & 0.374 & 1.36x \\
+$(32, 8)$  & 0.510 & 0.380 & 1.34x \\
+$(16, 32)$ & 0.504 & 0.367 & 1.37x \\
+$(32, 32)$ & 0.540 & 0.395 & 1.37x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{blocksize_shared.png}
+\caption{Kernel time without shared memory (blue) and with shared memory (orange).}
+\label{fig:shared}
+\end{figure}
+
+The best configuration is $(16, 32)$ for both versions: 0.504 ms without shared memory and
+0.367 ms with it.
+
+\section{Comment}
+Shared memory makes the kernel about 1.35 times faster, and the gain is almost the same for
+every block size.
+
+\end{document}
