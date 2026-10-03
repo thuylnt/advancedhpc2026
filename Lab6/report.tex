@@ -1,0 +1,52 @@
+\documentclass[10pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+
+\title{Labwork 6\\\large HPC -- Map by GPU}
+\author{
+Le Nghiem Thanh Thuy - 2540023\\
+University of Science and Technology of Hanoi
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Preparation}
+The first image is \texttt{coffee()} from \texttt{skimage.data}, size $600\times400$ with 3
+channels. The second image is raining in town which downloaded from internet, resized to $600\times400$.
+
+\section{Binarization}
+Converting the image to grayscale and then binarizing it with a parameterized threshold, we get the following results:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{binarization.png}
+\caption{Binarization with threshold = 100.}
+\label{fig:shared}
+\end{figure}
+
+\section{Brightness Control}
+Increasing the brightness of the image by a parameterized value, we get the following results:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{brightness.png}
+\caption{Brightness control with parameter = 80.}
+\label{fig:shared}
+\end{figure}
+
+
+\section{Blending images}
+Combining two images with a parameterized alpha, we get the following results:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{blending.png}
+\caption{Blending images with alpha = 0.3.}
+\label{fig:shared}
+\end{figure}
+
+\end{document}
